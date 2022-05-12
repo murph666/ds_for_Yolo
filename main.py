@@ -13,6 +13,7 @@ class_name_to_id_mapping = {"good": 0}
 
 def extract_info_from_xml(xml_file, path):
     #print("extract_info_from_xml >", path + "" + xml_file)
+    print(xml_file, path)
     root = ET.parse(path + "/" + xml_file).getroot()
 
     # Initialise the info dict
@@ -49,8 +50,7 @@ def extract_info_from_xml(xml_file, path):
 
 def convert_to_yolov5(info_dict):
     print_buffer = []
-    
-    # For each bounding box
+
     for b in info_dict["bboxes"]:
         try:
             class_id = class_name_to_id_mapping[b["class"]]
@@ -73,11 +73,6 @@ def convert_to_yolov5(info_dict):
         #Write the bbox details to the file 
         print_buffer.append("{} {:.5f} {:.5f} {:.5f} {:.5f}".format(class_id, b_center_x, b_center_y, b_width, b_height))
         
-    # Name of the file which we have to save 
-    save_file_name = os.path.join("annotations", info_dict["filename"].replace("png", "txt"))
-    
-    # Save the annotation to disk
-    #print("\n".join(print_buffer), file= open(save_file_name, "w"))
 
     return "\n".join(print_buffer)
 
@@ -99,9 +94,10 @@ def getDirectoryStructure(path):
 def extractAllXml(path):
     for (dirpath, dirnames, filenames) in os.walk(path):
         for file in filenames:
-            #extract_info_from_xml(file, path)
-            if file == "frame13.xml":
-                print(convert_to_yolov5(extract_info_from_xml(file, path)))
+            
+            filepath = SOURSE_LABELS_TRAIN_PATH + "/" + file.replace("xml", "txt")
+            print(convert_to_yolov5(extract_info_from_xml(file, path)), file= open(filepath, "w"))
+                
 
 
 if __name__ == "__main__":
